@@ -7,20 +7,22 @@ namespace joystick
     public abstract class JoystickBase : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         //private variable
-        private float Horizontal => (_isSnapX) ? SnapFloat(_input.x, AxisTypes.Horizontal) : _input.x;
-        private float Vertical => (_isSnapY) ? SnapFloat(_input.y, AxisTypes.Vertical) : _input.y;
+        private float Horizontal => (_isSnapX) ? SnapFloat(_direction.x, AxisTypes.Horizontal) : _direction.x;
+        private float Vertical => (_isSnapY) ? SnapFloat(_direction.y, AxisTypes.Vertical) : _direction.y;
 
 
         [SerializeField] private float _handleRange = 1;
         [SerializeField] private float _deadZone = 0;
+        [Space]
         [SerializeField] private AxisTypes _axisType = AxisTypes.Both;
         [SerializeField] private bool _isSnapX = false;
         [SerializeField] private bool _isSnapY = false;
+        [Space]
         [SerializeField] private Setting _setting;
 
 
         private Camera _camera;
-        private Vector2 _input;
+        private Vector2 _direction;
 
 
         //protected variable
@@ -28,12 +30,8 @@ namespace joystick
 
 
         //public variable
-        public Vector2 GetDirection()
-        {
-            Debug.Log($"GetDirection{_input}");
-            return _input;
-        } //new Vector2(Horizontal, Vertical);
-
+        public Vector2 Direction => _direction;
+        
         public AxisTypes AxisType => _axisType;
 
 
@@ -54,12 +52,12 @@ namespace joystick
 
             var position = RectTransformUtility.WorldToScreenPoint(_camera, JoystickBody.position);
             var radius = JoystickBody.sizeDelta                / 2;
-            _input = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
+            _direction = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
 
             FormatInput();
-            HandleInput(_input.magnitude, _input.normalized);
-            _setting.JoystickBodyHandle.anchoredPosition = _input * radius * _handleRange;
-            Debug.Log(_input);
+            HandleInput(_direction.magnitude, _direction.normalized);
+            _setting.JoystickBodyHandle.anchoredPosition = _direction * radius * _handleRange;
+            Debug.Log(_direction);
         }
 
         public virtual void OnPointerUp(PointerEventData eventData)
@@ -106,7 +104,7 @@ namespace joystick
             if (magnitude > _deadZone)
             {
                 if (magnitude > 1)
-                    _input = normalised;
+                    _direction = normalised;
             }
             // else
             //     _input = Vector2.zero;
@@ -135,9 +133,9 @@ namespace joystick
         private void FormatInput()
         {
             if (_axisType == AxisTypes.Horizontal)
-                _input = new Vector2(_input.x, 0f);
+                _direction = new Vector2(_direction.x, 0f);
             else if (_axisType == AxisTypes.Vertical)
-                _input = new Vector2(0f, _input.y);
+                _direction = new Vector2(0f, _direction.y);
         }
 
         private float SnapFloat(float value, AxisTypes snapAxis)
@@ -147,7 +145,7 @@ namespace joystick
 
             if (_axisType == AxisTypes.Both)
             {
-                float angle = Vector2.Angle(_input, Vector2.up);
+                float angle = Vector2.Angle(_direction, Vector2.up);
                 if (snapAxis == AxisTypes.Horizontal)
                 {
                     if (angle < 22.5f || angle > 157.5f)
