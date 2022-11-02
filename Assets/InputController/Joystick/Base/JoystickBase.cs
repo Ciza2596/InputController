@@ -30,7 +30,7 @@ namespace joystick
 
 
         //public variable
-        public Vector2 Direction => _direction;
+        public Vector2 Direction => new Vector2(Horizontal, Vertical);
         
         public AxisTypes AxisType => _axisType;
 
