@@ -4,98 +4,98 @@ using UnityEngine.EventSystems;
 
 namespace joystick
 {
-    public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
-    {
-        public float Horizontal
-        {
-            get { return (_snapX) ? SnapFloat(_input.x, AxisOptions.Horizontal) : _input.x; }
-        }
+    public abstract class JoystickBase : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+    {    
 
-        public float Vertical
-        {
-            get { return (_snapY) ? SnapFloat(_input.y, AxisOptions.Vertical) : _input.y; }
-        }
-
-        public Vector2 Direction
-        {
-            get { return new Vector2(Horizontal, Vertical); }
-        }
-
-        public float HandleRange
-        {
-            get { return _handleRange; }
-            set { _handleRange = Mathf.Abs(value); }
-        }
-
-        public float DeadZone
-        {
-            get { return _deadZone; }
-            set { _deadZone = Mathf.Abs(value); }
-        }
-
-        protected RectTransform JoystickBodyBackground => _setting.JoystickBodyBackground;
-
-        public AxisOptions AxisOptions
-        {
-            get { return AxisOptions; }
-            set { _axisOptions = value; }
-        }
-
-        public bool SnapX
-        {
-            get { return _snapX; }
-            set { _snapX = value; }
-        }
-
-        public bool SnapY
-        {
-            get { return _snapY; }
-            set { _snapY = value; }
-        }
-
+        //private variable
+        private float Horizontal => (_isSnapX) ? SnapFloat(_input.x, AxisTypes.Horizontal) : _input.x;
+        private float Vertical => (_isSnapY) ? SnapFloat(_input.y, AxisTypes.Vertical) : _input.y;
+        
+        
         [SerializeField] private float _handleRange = 1;
         [SerializeField] private float _deadZone = 0;
-        [SerializeField] private AxisOptions _axisOptions = AxisOptions.Both;
-        [SerializeField] private bool _snapX = false;
-        [SerializeField] private bool _snapY = false;
-
+        [SerializeField] private AxisTypes _axisType = AxisTypes.Both;
+        [SerializeField] private bool _isSnapX = false;
+        [SerializeField] private bool _isSnapY = false;
         [SerializeField] private Setting _setting;
+        
+
         private Camera _camera;
-
         private Vector2 _input = Vector2.zero;
+        
+        
+        //protected variable
+        protected RectTransform JoystickBody => _setting.JoystickBody;
+        
+        
+        //public variable
+        public Vector2 Direction => new Vector2(Horizontal, Vertical);
+        public AxisTypes AxisType => _axisType;
 
-        protected virtual void Start()
-        {
-            HandleRange = _handleRange;
-            DeadZone = _deadZone;
 
-            Vector2 center = new Vector2(0.5f, 0.5f);
-            JoystickBodyBackground.pivot = center;
-            _handle.anchorMin = center;
-            _handle.anchorMax = center;
-            _handle.pivot = center;
-            _handle.anchoredPosition = Vector2.zero;
-        }
+
+        //unity callback
 
         public virtual void OnPointerDown(PointerEventData eventData)
         {
-            OnDrag(eventData);
+            //ShowJoystick();
         }
 
         public void OnDrag(PointerEventData eventData)
         {
+            ShowJoystick();
+            
             _camera = null;
-            if (_canvas.renderMode == RenderMode.ScreenSpaceCamera)
-                _camera = _canvas.worldCamera;
+            if (_setting.Canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                _camera = _setting.Canvas.worldCamera;
 
-            Vector2 position = RectTransformUtility.WorldToScreenPoint(_camera, JoystickBodyBackground.position);
-            Vector2 radius = JoystickBodyBackground.sizeDelta             / 2;
-            _input = (eventData.position - position) / (radius * _canvas.scaleFactor);
+            var position = RectTransformUtility.WorldToScreenPoint(_camera, JoystickBody.position);
+            var radius = JoystickBody.sizeDelta      / 2;
+            _input = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
             FormatInput();
             HandleInput(_input.magnitude, _input.normalized, radius, _camera);
-            _handle.anchoredPosition = _input * radius * _handleRange;
+            _setting.JoystickBodyHandle.anchoredPosition = _input * radius * _handleRange;
         }
 
+        public virtual void OnPointerUp(PointerEventData eventData)
+        {
+            HideJoystick();
+            _input = Vector2.zero;
+            _setting.JoystickBodyHandle.anchoredPosition = Vector2.zero;
+        }
+
+
+        //public method
+
+        public void Init(AxisTypes axisType = AxisTypes.Both, bool isSnapX = false, bool isSnapY = false)
+        {
+            SetAxisType(axisType);
+            SetIsSnapX(isSnapX);
+            SetIsSnapY(isSnapY);
+            
+            Init();
+        }
+
+        public void Init()
+        {
+            HideJoystick();
+            
+            Vector2 center = new Vector2(0.5f, 0.5f);
+            JoystickBody.pivot = center;
+
+            var joystickBodyHandle = _setting.JoystickBodyHandle;
+            joystickBodyHandle.anchorMin = center;
+            joystickBodyHandle.anchorMax = center;
+            joystickBodyHandle.pivot = center;
+            joystickBodyHandle.anchoredPosition = Vector2.zero;
+        }
+
+        public void SetAxisType(AxisTypes axisType) => _axisType = axisType;
+        public void SetIsSnapX(bool isSnapX) => _isSnapX = isSnapX;
+        public void SetIsSnapY(bool isSnapY) => _isSnapY = isSnapY;
+
+
+        //protected method
         protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
         {
             if (magnitude > _deadZone)
@@ -107,30 +107,51 @@ namespace joystick
                 _input = Vector2.zero;
         }
 
+        protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
+        {
+            var localPoint = Vector2.zero;
+            var touchPadRectTransform = _setting.TouchPadRectTransform;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(touchPadRectTransform, screenPosition, _camera,
+                                                                        out localPoint))
+            {
+                var pivotOffset = touchPadRectTransform.pivot         * touchPadRectTransform.sizeDelta;
+                return localPoint - (JoystickBody.anchorMax * touchPadRectTransform.sizeDelta) + pivotOffset;
+            }
+
+            return Vector2.zero;
+        }
+
+        protected abstract void ShowJoystick();
+        protected abstract void HideJoystick();
+        
+
+
+        //private method
+
         private void FormatInput()
         {
-            if (_axisOptions == AxisOptions.Horizontal)
+            if (_axisType == AxisTypes.Horizontal)
                 _input = new Vector2(_input.x, 0f);
-            else if (_axisOptions == AxisOptions.Vertical)
+            else if (_axisType == AxisTypes.Vertical)
                 _input = new Vector2(0f, _input.y);
         }
 
-        private float SnapFloat(float value, AxisOptions snapAxis)
+        private float SnapFloat(float value, AxisTypes snapAxis)
         {
             if (value == 0)
                 return value;
 
-            if (_axisOptions == AxisOptions.Both)
+            if (_axisType == AxisTypes.Both)
             {
                 float angle = Vector2.Angle(_input, Vector2.up);
-                if (snapAxis == AxisOptions.Horizontal)
+                if (snapAxis == AxisTypes.Horizontal)
                 {
                     if (angle < 22.5f || angle > 157.5f)
                         return 0;
                     else
                         return (value > 0) ? 1 : -1;
                 }
-                else if (snapAxis == AxisOptions.Vertical)
+                else if (snapAxis == AxisTypes.Vertical)
                 {
                     if (angle > 67.5f && angle < 112.5f)
                         return 0;
@@ -151,40 +172,22 @@ namespace joystick
             return 0;
         }
 
-        public virtual void OnPointerUp(PointerEventData eventData)
-        {
-            _input = Vector2.zero;
-            _handle.anchoredPosition = Vector2.zero;
-        }
-
-        protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
-        {
-            Vector2 localPoint = Vector2.zero;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(_baseRect, screenPosition, _camera, out localPoint))
-            {
-                Vector2 pivotOffset = _baseRect.pivot      * _baseRect.sizeDelta;
-                return localPoint - (JoystickBodyBackground.anchorMax * _baseRect.sizeDelta) + pivotOffset;
-            }
-
-            return Vector2.zero;
-        }
-        
+        //model
         [Serializable]
         protected class Setting
         {
             public Canvas Canvas;
-            public RectTransform TouchPad;
-            
-            [Space] 
-            public RectTransform JoystickBodyBackground;
+            public RectTransform TouchPadRectTransform;
+
+            [Space] public RectTransform JoystickBody;
             public RectTransform JoystickBodyHandle;
         }
-    }
 
-    public enum AxisOptions
-    {
-        Both,
-        Horizontal,
-        Vertical
+        public enum AxisTypes
+        {
+            Both,
+            Horizontal,
+            Vertical
+        }
     }
 }
