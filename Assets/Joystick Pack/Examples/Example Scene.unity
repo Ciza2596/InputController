@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d73bf03f88f371469fd7b43fc97d77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  variableJoystick: {fileID: 0}
+  variableJoystick: {fileID: 1922807813}
   valueText: {fileID: 2124901095}
   background: {fileID: 0}
   axisSprites:

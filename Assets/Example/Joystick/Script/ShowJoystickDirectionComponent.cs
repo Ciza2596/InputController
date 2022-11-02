@@ -15,10 +15,8 @@ namespace joystick.Example
             if(_joystick is null)
                 return;
 
-            var content = $"Joystick Direction: {_joystick.Direction.ToString()}";
+            var content = $"Joystick Direction: {_joystick.GetDirection().ToString()}";
             direction_Text.text = content;
-            Debug.Log(content);
-            
         }
 
     }

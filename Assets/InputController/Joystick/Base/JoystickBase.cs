@@ -5,33 +5,36 @@ using UnityEngine.EventSystems;
 namespace joystick
 {
     public abstract class JoystickBase : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
-    {    
-
+    {
         //private variable
         private float Horizontal => (_isSnapX) ? SnapFloat(_input.x, AxisTypes.Horizontal) : _input.x;
         private float Vertical => (_isSnapY) ? SnapFloat(_input.y, AxisTypes.Vertical) : _input.y;
-        
-        
+
+
         [SerializeField] private float _handleRange = 1;
         [SerializeField] private float _deadZone = 0;
         [SerializeField] private AxisTypes _axisType = AxisTypes.Both;
         [SerializeField] private bool _isSnapX = false;
         [SerializeField] private bool _isSnapY = false;
         [SerializeField] private Setting _setting;
-        
+
 
         private Camera _camera;
-        private Vector2 _input = Vector2.zero;
-        
-        
+        private Vector2 _input;
+
+
         //protected variable
         protected RectTransform JoystickBody => _setting.JoystickBody;
-        
-        
-        //public variable
-        public Vector2 Direction => new Vector2(Horizontal, Vertical);
-        public AxisTypes AxisType => _axisType;
 
+
+        //public variable
+        public Vector2 GetDirection()
+        {
+            Debug.Log($"GetDirection{_input}");
+            return _input;
+        } //new Vector2(Horizontal, Vertical);
+
+        public AxisTypes AxisType => _axisType;
 
 
         //unity callback
@@ -44,23 +47,25 @@ namespace joystick
         public void OnDrag(PointerEventData eventData)
         {
             ShowJoystick();
-            
+
             _camera = null;
             if (_setting.Canvas.renderMode == RenderMode.ScreenSpaceCamera)
                 _camera = _setting.Canvas.worldCamera;
 
             var position = RectTransformUtility.WorldToScreenPoint(_camera, JoystickBody.position);
-            var radius = JoystickBody.sizeDelta      / 2;
+            var radius = JoystickBody.sizeDelta                / 2;
             _input = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
+
             FormatInput();
-            HandleInput(_input.magnitude, _input.normalized, radius, _camera);
+            HandleInput(_input.magnitude, _input.normalized);
             _setting.JoystickBodyHandle.anchoredPosition = _input * radius * _handleRange;
+            Debug.Log(_input);
         }
 
         public virtual void OnPointerUp(PointerEventData eventData)
         {
             HideJoystick();
-            _input = Vector2.zero;
+            //_input = Vector2.zero;
             _setting.JoystickBodyHandle.anchoredPosition = Vector2.zero;
         }
 
@@ -72,15 +77,15 @@ namespace joystick
             SetAxisType(axisType);
             SetIsSnapX(isSnapX);
             SetIsSnapY(isSnapY);
-            
+
             Init();
         }
 
         public void Init()
         {
             HideJoystick();
-            
-            Vector2 center = new Vector2(0.5f, 0.5f);
+
+            var center = new Vector2(0.5f, 0.5f);
             JoystickBody.pivot = center;
 
             var joystickBodyHandle = _setting.JoystickBodyHandle;
@@ -96,15 +101,15 @@ namespace joystick
 
 
         //protected method
-        protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
+        private void HandleInput(float magnitude, Vector2 normalised)
         {
             if (magnitude > _deadZone)
             {
                 if (magnitude > 1)
                     _input = normalised;
             }
-            else
-                _input = Vector2.zero;
+            // else
+            //     _input = Vector2.zero;
         }
 
         protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
@@ -114,8 +119,8 @@ namespace joystick
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(touchPadRectTransform, screenPosition, _camera,
                                                                         out localPoint))
             {
-                var pivotOffset = touchPadRectTransform.pivot         * touchPadRectTransform.sizeDelta;
-                return localPoint - (JoystickBody.anchorMax * touchPadRectTransform.sizeDelta) + pivotOffset;
+                var pivotOffset = touchPadRectTransform.pivot * touchPadRectTransform.sizeDelta;
+                return localPoint - (JoystickBody.anchorMax   * touchPadRectTransform.sizeDelta) + pivotOffset;
             }
 
             return Vector2.zero;
@@ -123,7 +128,6 @@ namespace joystick
 
         protected abstract void ShowJoystick();
         protected abstract void HideJoystick();
-        
 
 
         //private method

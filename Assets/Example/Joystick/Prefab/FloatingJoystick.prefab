@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5931861258966048571}
-  - component: {fileID: 1171044427194602690}
   m_Layer: 0
   m_Name: ShowJoystickDirection
   m_TagString: Untagged
@@ -38,20 +37,6 @@ RectTransform:
   m_AnchoredPosition: {x: 50, y: 50}
   m_SizeDelta: {x: 450, y: 60}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1171044427194602690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2640736779562339747}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63164bc5c1db8114987f44dfc8aa2b3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _joystick: {fileID: 4869495779926550790}
-  direction_Text: {fileID: 5318205411827978430}
 --- !u!1 &4869495779769896517
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4869495779926550793}
   - component: {fileID: 4869495779926550790}
+  - component: {fileID: 918110233061131344}
   m_Layer: 0
   m_Name: FloatingJoystick
   m_TagString: Untagged
@@ -221,6 +207,20 @@ MonoBehaviour:
     JoystickBody: {fileID: 4869495780047077830}
     JoystickBodyHandle: {fileID: 4869495779769896514}
   _canvasGroup: {fileID: 4869495780047077831}
+--- !u!114 &918110233061131344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4869495779926550792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63164bc5c1db8114987f44dfc8aa2b3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _joystick: {fileID: 4869495779926550790}
+  direction_Text: {fileID: 5318205411827978430}
 --- !u!1 &4869495780047077833
 GameObject:
   m_ObjectHideFlags: 0
@@ -385,12 +385,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 600}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
