@@ -49,7 +49,6 @@ namespace joystick
             FormatInput();
             HandleInput(_direction.magnitude, _direction.normalized);
             _setting.JoystickBodyHandle.anchoredPosition = _direction * radius * _handleRange;
-            Debug.Log(_direction);
         }
 
         public virtual void OnPointerUp(PointerEventData eventData)
