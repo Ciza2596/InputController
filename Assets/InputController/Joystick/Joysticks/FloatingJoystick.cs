@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 namespace joystick
 {
-    public class FloatingJoystick : JoystickBase
+    public class FloatingJoystick : JoystickBase, IPointerDownHandler
     {
         //private variable
         [Space] [SerializeField] private CanvasGroup _canvasGroup;
@@ -11,10 +11,9 @@ namespace joystick
         //unity callback
         private void Awake() => Init();
 
-        public override void OnPointerDown(PointerEventData eventData)
+        public void OnPointerDown(PointerEventData eventData)
         {
             JoystickBody.anchoredPosition = ScreenPointToAnchoredPosition(eventData.position);
-            base.OnPointerDown(eventData);
         }
 
 
