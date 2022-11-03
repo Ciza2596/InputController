@@ -13,12 +13,10 @@ namespace joystick
 
         [SerializeField] private float _handleRange = 1;
         [SerializeField] private float _deadZone = 0;
-        [Space]
-        [SerializeField] private AxisTypes _axisType = AxisTypes.Both;
+        [Space] [SerializeField] private AxisTypes _axisType = AxisTypes.Both;
         [SerializeField] private bool _isSnapX = false;
         [SerializeField] private bool _isSnapY = false;
-        [Space]
-        [SerializeField] private Setting _setting;
+        [Space] [SerializeField] private Setting _setting;
 
 
         private Camera _camera;
@@ -31,7 +29,7 @@ namespace joystick
 
         //public variable
         public Vector2 Direction => new Vector2(Horizontal, Vertical);
-        
+
         public AxisTypes AxisType => _axisType;
 
 
@@ -45,7 +43,7 @@ namespace joystick
                 _camera = _setting.Canvas.worldCamera;
 
             var position = RectTransformUtility.WorldToScreenPoint(_camera, JoystickBody.position);
-            var radius = JoystickBody.sizeDelta                / 2;
+            var radius = JoystickBody.sizeDelta                    / 2;
             _direction = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
 
             FormatInput();
@@ -100,7 +98,7 @@ namespace joystick
                 _direction = Vector2.zero;
                 return;
             }
-            
+
             if (magnitude > 1)
                 _direction = normalised;
         }
@@ -124,7 +122,6 @@ namespace joystick
 
 
         //private method
-
         private void FormatInput()
         {
             if (_axisType == AxisTypes.Horizontal)
@@ -138,35 +135,28 @@ namespace joystick
             if (value == 0)
                 return value;
 
-            if (_axisType == AxisTypes.Both)
-            {
-                float angle = Vector2.Angle(_direction, Vector2.up);
-                if (snapAxis == AxisTypes.Horizontal)
-                {
-                    if (angle < 22.5f || angle > 157.5f)
-                        return 0;
-                    else
-                        return (value > 0) ? 1 : -1;
-                }
-                else if (snapAxis == AxisTypes.Vertical)
-                {
-                    if (angle > 67.5f && angle < 112.5f)
-                        return 0;
-                    else
-                        return (value > 0) ? 1 : -1;
-                }
+            if (_axisType != AxisTypes.Both)
+                return value > 0 ? 1 : -1;
 
-                return value;
-            }
-            else
+
+            var angle = Vector2.Angle(_direction, Vector2.up);
+            if (snapAxis == AxisTypes.Horizontal)
             {
-                if (value > 0)
-                    return 1;
-                if (value < 0)
-                    return -1;
+                if (angle < 22.5f || angle > 157.5f)
+                    return 0;
+
+                return value > 0 ? 1 : -1;
             }
 
-            return 0;
+            if (snapAxis == AxisTypes.Vertical)
+            {
+                if (angle > 67.5f && angle < 112.5f)
+                    return 0;
+
+                return value > 0 ? 1 : -1;
+            }
+
+            return value;
         }
 
         //model
