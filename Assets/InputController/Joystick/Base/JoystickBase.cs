@@ -38,13 +38,14 @@ namespace joystick
             ShowJoystick();
 
             _camera = null;
-            if (_setting.Canvas.renderMode == RenderMode.ScreenSpaceCamera)
-                _camera = _setting.Canvas.worldCamera;
+            var canvas = _setting.Canvas;
+            if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                _camera = canvas.worldCamera;
 
             var joystickBody = _setting.JoystickBody;
             var position = RectTransformUtility.WorldToScreenPoint(_camera, joystickBody.position);
             var radius = joystickBody.sizeDelta                    / 2;
-            _direction = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
+            _direction = (eventData.position - position) / (radius * canvas.scaleFactor);
 
             FormatInput();
             HandleInput(_direction.magnitude, _direction.normalized);
