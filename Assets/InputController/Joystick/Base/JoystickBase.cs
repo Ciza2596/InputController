@@ -16,16 +16,15 @@ namespace joystick
         [Space] [SerializeField] private AxisTypes _axisType = AxisTypes.Both;
         [SerializeField] private bool _isSnapX = false;
         [SerializeField] private bool _isSnapY = false;
-        [Space] [SerializeField] private Setting _setting;
-
 
         private Camera _camera;
         private Vector2 _direction;
 
 
         //protected variable
-        protected RectTransform JoystickBody => _setting.JoystickBody;
+        [Space] [SerializeField] protected Setting _setting;
 
+        
 
         //public variable
         public Vector2 Direction => new Vector2(Horizontal, Vertical);
@@ -42,8 +41,9 @@ namespace joystick
             if (_setting.Canvas.renderMode == RenderMode.ScreenSpaceCamera)
                 _camera = _setting.Canvas.worldCamera;
 
-            var position = RectTransformUtility.WorldToScreenPoint(_camera, JoystickBody.position);
-            var radius = JoystickBody.sizeDelta                    / 2;
+            var joystickBody = _setting.JoystickBody;
+            var position = RectTransformUtility.WorldToScreenPoint(_camera, joystickBody.position);
+            var radius = joystickBody.sizeDelta                    / 2;
             _direction = (eventData.position - position) / (radius * _setting.Canvas.scaleFactor);
 
             FormatInput();
@@ -76,7 +76,7 @@ namespace joystick
             HideJoystick();
 
             var center = new Vector2(0.5f, 0.5f);
-            JoystickBody.pivot = center;
+            _setting.JoystickBody.pivot = center;
 
             var joystickBodyHandle = _setting.JoystickBodyHandle;
             joystickBodyHandle.anchorMin = center;
@@ -111,7 +111,7 @@ namespace joystick
                                                                         out localPoint))
             {
                 var pivotOffset = touchPadRectTransform.pivot * touchPadRectTransform.sizeDelta;
-                return localPoint - (JoystickBody.anchorMax   * touchPadRectTransform.sizeDelta) + pivotOffset;
+                return localPoint - (_setting.JoystickBody.anchorMax   * touchPadRectTransform.sizeDelta) + pivotOffset;
             }
 
             return Vector2.zero;

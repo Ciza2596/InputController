@@ -13,7 +13,7 @@ namespace joystick
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            JoystickBody.anchoredPosition = ScreenPointToAnchoredPosition(eventData.position);
+            _setting.JoystickBody.anchoredPosition = ScreenPointToAnchoredPosition(eventData.position);
         }
 
 
