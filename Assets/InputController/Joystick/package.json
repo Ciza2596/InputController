@@ -1,0 +1,18 @@
+{
+  "name": "com.ciza.joystick",
+  "displayName": "Ciza.JoyStick",
+  "description": "JoyStick.",
+  "version": "0.0.1",
+  "unity": "2022.2",
+  "unityRelease": "1f1",
+  "dependencies": {},
+  "author": {
+    "name": "Ciza",
+    "email": "Ciza2596@gmail.com",
+    "url": "https://www.youtube.com/channel/UCSGlWqXN4O2T3fyIJSB9MCA"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ciza2596/GenericModule.git"
+  }
+}
