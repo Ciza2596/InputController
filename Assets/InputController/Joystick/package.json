@@ -1,7 +1,7 @@
 {
   "name": "com.ciza.joystick",
-  "displayName": "Ciza.JoyStick",
-  "description": "JoyStick.",
+  "displayName": "Ciza.Joystick",
+  "description": "Joystick.",
   "version": "0.0.1",
   "unity": "2022.2",
   "unityRelease": "1f1",
@@ -13,6 +13,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ciza2596/GenericModule"
+    "url": "https://github.com/Ciza2596/InputController.git"
   }
 }
